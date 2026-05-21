@@ -10,7 +10,7 @@ from setuptools import setup
 test_dependencies = [
     "apispec_webframeworks",
     "apispec[yaml]",
-    "black==22.8.0",
+    "black",
     "flake8",
     "flask",
     "isort",

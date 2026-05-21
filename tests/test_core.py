@@ -46,8 +46,16 @@ FOO_SCHEMA = {
         "a": {"format": "date-time", "type": "string"},
         "b": {"items": {"$ref": "#/definitions/Point"}, "type": "array"},
         "c": {"additionalProperties": {"type": "integer"}, "type": "object"},
-        "d": {"type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]},
-        "f": {"type": "array", "minItems": 2, "maxItems": 2, "items": [{"type": "string"}, {"type": "integer"}]},
+        "d": {
+            "type": "string",
+            "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        },
+        "f": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": [{"type": "string"}, {"type": "integer"}],
+        },
         "g": {"type": "array", "items": {"type": "string"}},
         "e": {"type": "string", "minLength": 5, "maxLength": 8},
         "h": {"$ref": "#/definitions/Point"},
@@ -67,7 +75,12 @@ SWAGGER_V2_FOO_SCHEMA = {
             "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             "x-enum-name": "Weekday",
         },
-        "f": {"type": "array", "minItems": 2, "maxItems": 2, "items": [{"type": "string"}, {"type": "integer"}]},
+        "f": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": [{"type": "string"}, {"type": "integer"}],
+        },
         "g": {"type": "array", "items": {"type": "string"}},
         "e": {"type": "string", "minLength": 5, "maxLength": 8},
         "h": {"$ref": "#/definitions/Point"},
@@ -87,7 +100,12 @@ SWAGGER_V3_FOO_SCHEMA = {
             "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             "x-enum-name": "Weekday",
         },
-        "f": {"type": "array", "minItems": 2, "maxItems": 2, "items": [{"type": "string"}, {"type": "integer"}]},
+        "f": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": [{"type": "string"}, {"type": "integer"}],
+        },
         "g": {"type": "array", "items": {"type": "string"}},
         "e": {"type": "string", "minLength": 5, "maxLength": 8},
         "h": {"$ref": "#/components/schemas/Point"},
@@ -123,7 +141,10 @@ OPAQUE_DATA_SCHEMA = {
 
 PRODUCT_SCHEMA = {
     "description": Product.__doc__,
-    "properties": {"cost": {"type": "number", "default": 20.0}, "name": {"type": "string"}},
+    "properties": {
+        "cost": {"type": "number", "default": 20.0},
+        "name": {"type": "string"},
+    },
     "required": ["name"],
     "type": "object",
 }
@@ -138,7 +159,12 @@ SHOPPING_CART_SCHEMA = {
 }
 PRODUCT_LIST_SCHEMA = {
     "description": ProductList.__doc__,
-    "properties": {"products": {"additionalProperties": {"$ref": "#/definitions/Product"}, "type": "object"}},
+    "properties": {
+        "products": {
+            "additionalProperties": {"$ref": "#/definitions/Product"},
+            "type": "object",
+        }
+    },
     "type": "object",
     "required": ["products"],
 }
@@ -150,7 +176,10 @@ BAR_SCHEMA = {
             "anyOf": [
                 {"$ref": "#/definitions/Point"},
                 {"type": "string"},
-                {"type": "string", "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]},
+                {
+                    "type": "string",
+                    "enum": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                },
             ]
         }
     },
@@ -159,7 +188,13 @@ BAR_SCHEMA = {
 ZOO_SCHEMA = {
     "type": "object",
     "description": "A zoo",
-    "properties": {"animal_types": {"additionalProperties": {"type": "string"}, "type": "object", "default": {}}},
+    "properties": {
+        "animal_types": {
+            "additionalProperties": {"type": "string"},
+            "type": "object",
+            "default": {},
+        }
+    },
 }
 BAZ_SCHEMA = {
     "description": "Type with nested default value",
@@ -422,7 +457,12 @@ def test_field_types():
         cost=Currency(Decimal("49.99")),
         uuid=expected_uuid,
     )
-    expected_dict = {"ip_address": "127.0.0.1", "ipv6_address": "::1", "cost": 49.99, "uuid": str(expected_uuid)}
+    expected_dict = {
+        "ip_address": "127.0.0.1",
+        "ipv6_address": "::1",
+        "cost": 49.99,
+        "uuid": str(expected_uuid),
+    }
     assert expected_obj == AllFieldTypes.from_dict(expected_dict)
     assert expected_obj.to_dict() == expected_dict
 
@@ -535,13 +575,17 @@ def test_from_object():
         books: Optional[List[Book]] = None
 
     sample_author = AuthorModel(
-        "Joe Bloggs", 32, [BookModel("Hello World!", datetime.datetime.utcnow(), "ACME Corp", "biography")]
+        "Joe Bloggs",
+        32,
+        [BookModel("Hello World!", datetime.datetime.utcnow(), "ACME Corp", "biography")],
     )
     expected_author = Author("Joe Bloggs", books=[Book("Hello World!", "ACME Corp", Genre.BIOGRAPHY)])
     assert Author.from_object(sample_author, exclude=("age", ("books", ("first_print",)))) == expected_author
 
     sample_author_2 = AuthorModel(
-        "Joe Bloggs", 32, [BookModel("Hello World!", datetime.datetime.utcnow(), "ACME Corp", None)]
+        "Joe Bloggs",
+        32,
+        [BookModel("Hello World!", datetime.datetime.utcnow(), "ACME Corp", None)],
     )
     expected_author_2 = Author("Joe Bloggs", books=[Book("Hello World!", "ACME Corp", None)])
     assert Author.from_object(sample_author_2, exclude=("age", ("books", ("first_print",)))) == expected_author_2
@@ -581,7 +625,11 @@ def test_inherited_schema():
             "description": "A cat",
             "allOf": [
                 {"$ref": "#/definitions/Pet"},
-                {"type": "object", "properties": {"hunting_skill": {"type": "string"}}, "required": ["hunting_skill"]},
+                {
+                    "type": "object",
+                    "properties": {"hunting_skill": {"type": "string"}},
+                    "required": ["hunting_skill"],
+                },
             ],
         },
         {
@@ -598,7 +646,11 @@ def test_inherited_schema():
             "description": "A dog",
             "allOf": [
                 {"$ref": "#/definitions/Pet"},
-                {"type": "object", "properties": {"breed": {"type": "string"}}, "required": ["breed"]},
+                {
+                    "type": "object",
+                    "properties": {"breed": {"type": "string"}},
+                    "required": ["breed"],
+                },
             ],
         },
         {
@@ -642,7 +694,10 @@ def test_nullable_field():
     expected_openapi_3_schema = {
         "type": "object",
         "description": "An employee",
-        "properties": {"name": {"type": "string"}, "manager": {"type": "string", "nullable": True}},
+        "properties": {
+            "name": {"type": "string"},
+            "manager": {"type": "string", "nullable": True},
+        },
         "required": ["name"],
         "x-module-name": "tests.test_core",
     }
@@ -650,7 +705,10 @@ def test_nullable_field():
         {
             "type": "object",
             "description": "An employee",
-            "properties": {"name": {"type": "string"}, "manager": {"oneOf": [{"type": "string"}, {"type": "null"}]}},
+            "properties": {
+                "name": {"type": "string"},
+                "manager": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+            },
             "required": ["name"],
         }
     )
@@ -744,7 +802,11 @@ def test_set_decode_encode():
             "description": "A blog article",
             "properties": {
                 "content": {"type": "string"},
-                "tags": {"type": "array", "items": {"type": "string"}, "uniqueItems": True},
+                "tags": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "uniqueItems": True,
+                },
             },
             "required": ["content", "tags"],
         }
@@ -755,7 +817,8 @@ def test_set_decode_encode():
         "tags": ["foo", "bar"],
     }
     expected_blog = BlogArticle(
-        content="Lorem ipsum dolor sit amet, consectetur adipiscing elit...", tags={"foo", "bar"}
+        content="Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+        tags={"foo", "bar"},
     )
     assert isinstance(expected_blog.to_dict()["tags"], list)
     assert len(expected_blog.to_dict()["tags"]) == 2
@@ -888,7 +951,11 @@ def test_inherited_field_narrowing():
         {
             "allOf": [
                 {"$ref": "#/definitions/BaseObject"},
-                {"type": "object", "required": ["field"], "properties": {"field": {"enum": ["staticstr"]}}},
+                {
+                    "type": "object",
+                    "required": ["field"],
+                    "properties": {"field": {"enum": ["staticstr"]}},
+                },
             ],
             "description": "Narrowed",
             "$schema": "http://json-schema.org/draft-06/schema#",
@@ -896,7 +963,10 @@ def test_inherited_field_narrowing():
                 "BaseObject": {
                     "type": "object",
                     "required": ["other", "field"],
-                    "properties": {"field": {"type": "string"}, "other": {"type": "number"}},
+                    "properties": {
+                        "field": {"type": "string"},
+                        "other": {"type": "number"},
+                    },
                     "description": "Base",
                 }
             },
@@ -921,12 +991,19 @@ def test_unrecognized_enum_value():
         type: PetType
         favourite_food: Optional[FoodType] = None
 
-    p = Pet.from_dict({"name": "snakey", "type": "python", "favourite_food": "mice"}, validate_enums=False)
+    p = Pet.from_dict(
+        {"name": "snakey", "type": "python", "favourite_food": "mice"},
+        validate_enums=False,
+    )
     assert p.type == "python"
     assert p.favourite_food == "mice"
 
     with pytest.warns(UserWarning):
-        assert p.to_dict() == {"name": "snakey", "type": "python", "favourite_food": "mice"}
+        assert p.to_dict() == {
+            "name": "snakey",
+            "type": "python",
+            "favourite_food": "mice",
+        }
 
 
 def test_inheritance_and_additional_properties_disallowed():
@@ -1059,7 +1136,12 @@ def test_tuple_item_schema():
         text: str
         point: Tuple[float, float]
 
-    expected_tuple_schema = {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+    expected_tuple_schema = {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {"type": "number"},
+    }
     assert MapNote.json_schema()["properties"]["point"] == expected_tuple_schema
 
 

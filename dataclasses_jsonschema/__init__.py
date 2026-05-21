@@ -471,7 +471,16 @@ class JsonSchemaMixin:
                 for name, member in members:
                     if name != "__weakref__" and (include_properties is None or name in include_properties):
                         if IS_PYTHON_310_PLUS:
-                            f = Field(MISSING, None, None, None, None, None, None, kw_only=False)
+                            f = Field(
+                                MISSING,
+                                None,
+                                None,
+                                None,
+                                None,
+                                None,
+                                None,
+                                kw_only=False,
+                            )
                         else:
                             f = Field(MISSING, None, None, None, None, None, None)
                         f.name = name
@@ -612,7 +621,12 @@ class JsonSchemaMixin:
         return decoder(field, field_type, value)
 
     @classmethod
-    def _validate(cls, data: JsonDict, validate_enums: bool = True, schema_type: SchemaType = DEFAULT_SCHEMA_TYPE):
+    def _validate(
+        cls,
+        data: JsonDict,
+        validate_enums: bool = True,
+        schema_type: SchemaType = DEFAULT_SCHEMA_TYPE,
+    ):
         if schema_type == SchemaType.OPENAPI_3 or schema_type == SchemaType.SWAGGER_V2:
             warnings.warn("Only draft-04, draft-06 and draft-07 schema types are supported for validation")
             schema_type = DEFAULT_SCHEMA_TYPE
@@ -628,12 +642,16 @@ class JsonSchemaMixin:
                             formats[schema["format"]] = schema["pattern"]
 
                     schema_validator = fastjsonschema.compile(
-                        cls.json_schema(schema_type=schema_type, validate_enums=validate_enums), formats=formats
+                        cls.json_schema(schema_type=schema_type, validate_enums=validate_enums),
+                        formats=formats,
                     )
                     cls.__compiled_schema[SchemaOptions(schema_type, validate_enums)] = schema_validator
                 schema_validator(data)
             else:
-                validate_func(data, cls.json_schema(schema_type=schema_type, validate_enums=validate_enums))
+                validate_func(
+                    data,
+                    cls.json_schema(schema_type=schema_type, validate_enums=validate_enums),
+                )
         except JsonSchemaValidationError as e:
             raise ValidationError(str(e)) from e
 
@@ -810,7 +828,10 @@ class JsonSchemaMixin:
 
                     # If embedding into a swagger spec add the enum name as an extension.
                     # Note: Unlike swagger, JSON schema does not support extensions
-                    if schema_options.schema_type in (SchemaType.SWAGGER_V2, SchemaType.SWAGGER_V3):
+                    if schema_options.schema_type in (
+                        SchemaType.SWAGGER_V2,
+                        SchemaType.SWAGGER_V3,
+                    ):
                         field_schema["x-enum-name"] = field_type_name
                     if schema_options.schema_type == SchemaType.SWAGGER_V3:
                         field_schema["x-module-name"] = field_type.__module__
@@ -838,7 +859,7 @@ class JsonSchemaMixin:
                     "type": "array",
                     "minItems": tuple_len,
                     "maxItems": tuple_len,
-                    "items": item_schemas[0] if len(set(field_args)) == 1 else item_schemas,
+                    "items": (item_schemas[0] if len(set(field_args)) == 1 else item_schemas),
                 }
             elif field_type in JSON_ENCODABLE_TYPES:
                 field_schema.update(JSON_ENCODABLE_TYPES[field_type])
@@ -881,14 +902,20 @@ class JsonSchemaMixin:
 
     @classmethod
     def all_json_schemas(
-        cls: Type[T], schema_type: SchemaType = DEFAULT_SCHEMA_TYPE, validate_enums: bool = True
+        cls: Type[T],
+        schema_type: SchemaType = DEFAULT_SCHEMA_TYPE,
+        validate_enums: bool = True,
     ) -> JsonDict:
         """Returns JSON schemas for all subclasses"""
         definitions = {}
         for subclass in cls.__subclasses__():
             if is_dataclass(subclass):
                 definitions.update(
-                    subclass.json_schema(embeddable=True, schema_type=schema_type, validate_enums=validate_enums)
+                    subclass.json_schema(
+                        embeddable=True,
+                        schema_type=schema_type,
+                        validate_enums=validate_enums,
+                    )
                 )
             else:
                 definitions.update(subclass.all_json_schemas(schema_type=schema_type, validate_enums=validate_enums))

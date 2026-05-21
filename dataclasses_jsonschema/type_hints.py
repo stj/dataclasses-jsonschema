@@ -30,7 +30,12 @@ class RewriteUnionTypes(ast.NodeTransformer):
             return ast.Subscript(
                 value=ast.Name(id="_Union", ctx=ast.Load(), lineno=1, col_offset=1),
                 slice=ast.Index(
-                    value=ast.Tuple(elts=list(get_elts(node)), ctx=ast.Load(), lineno=1, col_offset=1),
+                    value=ast.Tuple(
+                        elts=list(get_elts(node)),
+                        ctx=ast.Load(),
+                        lineno=1,
+                        col_offset=1,
+                    ),
                     ctx=ast.Load(),
                     lineno=1,
                     col_offset=1,
