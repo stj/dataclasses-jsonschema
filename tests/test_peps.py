@@ -37,7 +37,12 @@ def test_pep_585_types():
         "a": {"type": "array", "items": {"type": "string"}},
         "b": {"additionalProperties": {"type": "integer"}, "type": "object"},
         "c": {"type": "array", "items": {"type": "integer"}, "uniqueItems": True},
-        "d": {"type": "array", "items": [{"type": "integer"}, {"type": "string"}], "maxItems": 2, "minItems": 2},
+        "d": {
+            "type": "array",
+            "items": [{"type": "integer"}, {"type": "string"}],
+            "maxItems": 2,
+            "minItems": 2,
+        },
     }
     assert Collections(a=["foo"], b={"bar": 123}, c={4, 5}, d=(6, "baz")).to_dict() == {
         "a": ["foo"],

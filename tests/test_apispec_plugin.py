@@ -72,7 +72,10 @@ EXPECTED_API_SPEC = {
                 "type": "object",
                 "properties": {
                     "name": {"type": "string"},
-                    "categories": {"type": "array", "items": {"$ref": "#/components/schemas/Category"}},
+                    "categories": {
+                        "type": "array",
+                        "items": {"$ref": "#/components/schemas/Category"},
+                    },
                 },
                 "required": ["categories", "name"],
             },
