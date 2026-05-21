@@ -1,12 +1,5 @@
 from setuptools import setup
 
-# requires = [
-#     "python-dateutil",
-#     "jsonschema",
-#     'typing_extensions;python_version<"3.8"',
-#     'dataclasses;python_version<"3.7"',
-# ]
-
 test_dependencies = [
     "apispec_webframeworks",
     "apispec[yaml]",
@@ -36,7 +29,7 @@ setup(
     author="Simon Knibbs",
     author_email="simon.knibbs@gmail.com",
     url="https://github.com/s-knibbs/dataclasses-jsonschema",
-    # install_requires=requires,
+    install_requires=read("requirements.txt"),
     extras_require={
         "apispec": ["apispec"],
         "fast-validation": ["fastjsonschema"],
