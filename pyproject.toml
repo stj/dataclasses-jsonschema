@@ -35,19 +35,23 @@ fast-uuid = [
 fast-validation = [
     "fastjsonschema",
 ]
+
+[dependency-groups]
 test = [
     "apispec[yaml]",
     "apispec_webframeworks",
-    "black",
-    "Flake8-pyproject",
     "flask",
-    "isort",
-    "mypy",
     "pytest",
     "pytest-ordering",
-    "tox",
-    "tox-gh-actions",
+]
+typing = [
+    "mypy",
     "types-python-dateutil",
+]
+formatting = [
+    "black",
+    "isort",
+    "Flake8-pyproject",
 ]
 
 [project.urls]
@@ -68,6 +72,7 @@ version_file = "dataclasses_jsonschema/_version.py"
 
 [tool.black]
 line-length = 120
+target-version = ["py313"]
 
 [tool.isort]
 profile = "black"
@@ -79,3 +84,66 @@ ignore = "E203, W503"  # https://github.com/PyCQA/pycodestyle/issues/373
 
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.tox]
+requires = ["tox"]
+env_list = [
+    "typing",
+    { prefix = "3.", start = 13, stop = 14 },
+    { product = [["3.13", "3.14"], ["fastvalidation", "fastdateparsing", "fastuuid", "all"]] },
+]
+
+[tool.tox.env_run_base]
+deps = [".[test]"]
+dependency_groups = ["test"]
+commands = [
+    ["pytest", "tests"],
+]
+
+[tool.tox.env.typing]
+description = "run static type checkers"
+dependency_groups = ["typing"]
+commands = [
+    ["mypy", "dataclasses_jsonschema"],
+]
+
+[tool.tox.env.formatting]
+description = "run linters"
+dependency_groups = ["formatting"]
+commands = [
+    ["black", "--check", "dataclasses_jsonschema", "tests"],
+    ["isort", "--check-only", "dataclasses_jsonschema", "tests"],
+    ["flake8", "dataclasses_jsonschema"],
+]
+
+[tool.tox.env."3.13-fastvalidation"]
+description = "run tests with fastjsonschema"
+extras = ["fast-validation"]
+
+[tool.tox.env."3.14-fastvalidation"]
+description = "run tests with fastjsonschema"
+extras = ["fast-validation"]
+
+[tool.tox.env."3.13-fastdateparsing"]
+description = "run tests with fastdateparsing"
+extras = ["fast-dateparsing"]
+
+[tool.tox.env."3.14-fastdateparsing"]
+description = "run tests with fastdateparsing"
+extras = ["fast-dateparsing"]
+
+[tool.tox.env."3.13-fastuuid"]
+description = "run tests with fastuuid"
+extras = ["fast-uuid"]
+
+[tool.tox.env."3.14-fastuuid"]
+description = "run tests with fastuuid"
+extras = ["fast-uuid"]
+
+[tool.tox.env."3.13-all"]
+description = "run tests with all extras"
+extras = ["fast-uuid", "fast-dateparsing", "fast-validation"]
+
+[tool.tox.env."3.14-all"]
+description = "run tests with all extras"
+extras = ["fast-uuid", "fast-dateparsing", "fast-validation"]
