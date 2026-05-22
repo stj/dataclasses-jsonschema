@@ -79,7 +79,7 @@ TUPLE_TYPES = ("Tuple", "tuple")
 
 PRIMITIVES: Tuple[Type, ...] = (int, str, float, bool, type(None))
 
-IS_PYTHON_310_PLUS = sys.version_info[:2] >= (3, 10)
+IS_PYTHON_314_PLUS = sys.version_info[:2] >= (3, 14)
 
 
 class ValidationError(Exception):
@@ -456,16 +456,29 @@ class JsonSchemaMixin:
                 members = inspect.getmembers(cls, inspect.isdatadescriptor)
                 for name, member in members:
                     if name != "__weakref__" and (include_properties is None or name in include_properties):
-                        f = Field(
-                            MISSING,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            kw_only=False,
-                        )
+                        if IS_PYTHON_314_PLUS:
+                            f = Field(
+                                MISSING,
+                                None,
+                                None,
+                                None,
+                                None,
+                                None,
+                                None,
+                                kw_only=False,
+                                doc=None,
+                            )
+                        else:
+                            f = Field(
+                                MISSING,
+                                None,
+                                None,
+                                None,
+                                None,
+                                None,
+                                None,
+                                kw_only=False,
+                            )
                         f.name = name
                         f.type = member.fget.__annotations__["return"]
                         mapped_fields.append(JsonSchemaField(f, name, is_property=True))

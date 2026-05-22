@@ -1,5 +1,11 @@
 import ast
 import sys
+
+try:
+    from annotationlib import get_annotations
+except ImportError:
+    from typing_extensions import get_annotations
+
 from typing import ForwardRef  # type: ignore
 from typing import _eval_type  # type: ignore
 from typing import Any, Dict, Type, Union
@@ -69,7 +75,7 @@ def get_class_type_hints(klass: Type, localns=None) -> Dict[str, Any]:
     for base in reversed(klass.__mro__):
         base_globals = sys.modules[base.__module__].__dict__
         base_globals["_Union"] = Union
-        ann = base.__dict__.get("__annotations__", {})
+        ann = get_annotations(base)
         for name, value in ann.items():
             if value is None:
                 value = type(None)
