@@ -1,3 +1,71 @@
+[project]
+name = "dataclasses-jsonschema"
+dynamic = ["version"]
+description = "JSON schema generation from dataclasses"
+readme = "README.rst"
+license = "MIT"
+authors = [
+    { name = "Simon Knibbs", email = "simon.knibbs@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries",
+]
+requires-python = ">=3.13"
+dependencies = [
+    "jsonschema==4.26.0",
+    "python-dateutil==2.9.0.post0",
+    "typing-extensions; python_version < \"3.14\"",
+]
+
+[project.optional-dependencies]
+apispec = [
+    "apispec",
+]
+fast-dateparsing = [
+    "ciso8601",
+]
+fast-uuid = [
+    "fastuuid",
+]
+fast-validation = [
+    "fastjsonschema",
+]
+test = [
+    "apispec[yaml]",
+    "apispec_webframeworks",
+    "black",
+    "Flake8-pyproject",
+    "flask",
+    "isort",
+    "mypy",
+    "pytest",
+    "pytest-ordering",
+    "tox",
+    "tox-gh-actions",
+    "types-python-dateutil",
+]
+
+[project.urls]
+Homepage = "https://github.com/s-knibbs/dataclasses-jsonschema"
+
+[build-system]
+requires = ["setuptools", "setuptools-scm", "pytest-runner"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["dataclasses_jsonschema"]
+
+[tool.setuptools.package-data]
+"dataclasses_jsonschema" = ["py.typed"]
+
+[tool.setuptools_scm]
+version_file = "dataclasses_jsonschema/_version.py"
+
 [tool.black]
 line-length = 120
 
