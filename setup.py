@@ -4,7 +4,7 @@ test_dependencies = [
     "apispec_webframeworks",
     "apispec[yaml]",
     "black",
-    "flake8",
+    "Flake8-pyproject",
     "flask",
     "isort",
     "mypy",
