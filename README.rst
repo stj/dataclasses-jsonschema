@@ -9,7 +9,7 @@ Dataclasses JSON Schema
 
 **⚠️Please Note⚠️:** **Because of health reasons I'm not longer able to make changes to this project or make further releases via PyPI.**
 
-A library to generate JSON Schema from python 3.7 dataclasses. Python 3.6 is supported through the `dataclasses backport <https://github.com/ericvsmith/dataclasses>`_. Aims to be a more lightweight alternative to similar projects such as `marshmallow <https://github.com/marshmallow-code/marshmallow>`_ & `pydantic <https://github.com/samuelcolvin/pydantic>`_.
+A library to generate JSON Schema from python 3 dataclasses. Aims to be a more lightweight alternative to similar projects such as `marshmallow <https://github.com/marshmallow-code/marshmallow>`_ & `pydantic <https://github.com/samuelcolvin/pydantic>`_.
 
 Feature Overview
 ----------------

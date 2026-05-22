@@ -14,7 +14,9 @@ from typing import (
     Callable,
     ClassVar,
     Dict,
+    Final,
     List,
+    Literal,
     Optional,
     Tuple,
     Type,
@@ -22,11 +24,6 @@ from typing import (
     Union,
 )
 from uuid import UUID as SlowUUID
-
-try:
-    from typing import Final, Literal  # type: ignore
-except ImportError:
-    from typing_extensions import Final, Literal  # type: ignore
 
 try:
     from fastuuid import UUID as FastUUID
@@ -82,8 +79,6 @@ TUPLE_TYPES = ("Tuple", "tuple")
 
 PRIMITIVES: Tuple[Type, ...] = (int, str, float, bool, type(None))
 
-IS_PYTHON_36 = sys.version_info[:2] == (3, 6)
-IS_PYTHON_37_PLUS = sys.version_info[:2] >= (3, 7)
 IS_PYTHON_310_PLUS = sys.version_info[:2] >= (3, 10)
 
 
@@ -125,8 +120,6 @@ def is_final(field: Any) -> bool:
     try:
         return field.__origin__ == Final
     except AttributeError:
-        if IS_PYTHON_36:
-            return type(field).__qualname__ == "_Final"
         return False
 
 
@@ -134,23 +127,18 @@ def is_literal(field: Any) -> bool:
     try:
         return field.__origin__ == Literal
     except AttributeError:
-        if IS_PYTHON_36:
-            return type(field).__qualname__ == "_Literal"
         return False
 
 
 def is_nullable(field: Any) -> bool:
     try:
-        if IS_PYTHON_36:
-            # Hack to get python 3.6 working
-            return "_NULL_TYPE" in repr(field)
         return field.__origin__ == Union and _NULL_TYPE in field.__args__
     except AttributeError:
         return False
 
 
 def unwrap_final(final_type: Any) -> Any:
-    return final_type.__args__[0] if IS_PYTHON_37_PLUS else final_type.__type__
+    return final_type.__args__[0]
 
 
 def unwrap_optional(optional_type: Any) -> Any:
@@ -161,8 +149,6 @@ def unwrap_optional(optional_type: Any) -> Any:
 
 def unwrap_nullable(nullable_type: Any) -> Any:
     args = nullable_type.__args__
-    if IS_PYTHON_36:
-        return Union[args]
     idx = args.index(_NULL_TYPE)
     return Union[args[:idx] + args[idx + 1 :]]
 
@@ -470,19 +456,16 @@ class JsonSchemaMixin:
                 members = inspect.getmembers(cls, inspect.isdatadescriptor)
                 for name, member in members:
                     if name != "__weakref__" and (include_properties is None or name in include_properties):
-                        if IS_PYTHON_310_PLUS:
-                            f = Field(
-                                MISSING,
-                                None,
-                                None,
-                                None,
-                                None,
-                                None,
-                                None,
-                                kw_only=False,
-                            )
-                        else:
-                            f = Field(MISSING, None, None, None, None, None, None)
+                        f = Field(
+                            MISSING,
+                            None,
+                            None,
+                            None,
+                            None,
+                            None,
+                            None,
+                            kw_only=False,
+                        )
                         f.name = name
                         f.type = member.fget.__annotations__["return"]
                         mapped_fields.append(JsonSchemaField(f, name, is_property=True))
@@ -810,7 +793,7 @@ class JsonSchemaMixin:
             elif is_final(field_type):
                 field_schema, required = cls._get_field_schema(unwrap_final(field_type), schema_options)
             elif is_literal(field_type):
-                field_schema = {"enum": list(field_args if IS_PYTHON_37_PLUS else field_type.__values__)}
+                field_schema = {"enum": list(field_args)}
             elif is_enum(field_type):
                 member_types = set()
                 values = []

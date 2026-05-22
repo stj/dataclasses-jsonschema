@@ -1,14 +1,8 @@
 import ast
 import sys
-
-try:
-    from typing import ForwardRef  # type: ignore
-except ImportError:
-    # Python 3.6
-    from typing import _ForwardRef as ForwardRef  # type: ignore
-
+from typing import ForwardRef  # type: ignore
 from typing import _eval_type  # type: ignore
-from typing import Any, Dict, List, Set, Tuple, Type, Union
+from typing import Any, Dict, Type, Union
 
 
 def get_elts(op: ast.BinOp):
@@ -75,12 +69,6 @@ def get_class_type_hints(klass: Type, localns=None) -> Dict[str, Any]:
     for base in reversed(klass.__mro__):
         base_globals = sys.modules[base.__module__].__dict__
         base_globals["_Union"] = Union
-        if sys.version_info < (3, 9):
-            base_globals["_List"] = List
-            base_globals["_Set"] = Set
-            base_globals["_Type"] = Type
-            base_globals["_Tuple"] = Tuple
-            base_globals["_Dict"] = Dict
         ann = base.__dict__.get("__annotations__", {})
         for name, value in ann.items():
             if value is None:
@@ -90,8 +78,6 @@ def get_class_type_hints(klass: Type, localns=None) -> Dict[str, Any]:
                 union_transformer = RewriteUnionTypes()
                 t = union_transformer.visit(t)
                 builtin_generics_transformer = RewriteBuiltinGenerics()
-                if sys.version_info < (3, 9):
-                    t = builtin_generics_transformer.visit(t)
                 if builtin_generics_transformer.rewritten or union_transformer.rewritten:
                     # Note: ForwardRef raises a TypeError when given anything that isn't a string, so we need
                     # to compile & eval the ast here
