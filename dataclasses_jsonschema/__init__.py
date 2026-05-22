@@ -22,6 +22,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
 )
 from uuid import UUID as SlowUUID
 
@@ -726,11 +727,16 @@ class JsonSchemaMixin:
             if from_value is None:
                 values[f.field.name] = from_value
             elif cls._is_json_schema_subclass(ft):
+                ft = cast(JsonSchemaMixin, ft)
                 values[f.field.name] = ft.from_object(from_value, exclude=sub_exclude)
             elif is_enum(ft):
+                ft = cast(Type, ft)
+                issubclass(Enum, ft)
                 values[f.field.name] = ft(from_value)
-            elif field_type_name in ("List", "list") and cls._is_json_schema_subclass(ft.__args__[0]):
-                values[f.field.name] = [ft.__args__[0].from_object(v, exclude=sub_exclude) for v in from_value]
+            elif field_type_name in ("List", "list") and cls._is_json_schema_subclass(ft.__args__[0]):  # type: ignore
+                values[f.field.name] = [
+                    ft.__args__[0].from_object(v, exclude=sub_exclude) for v in from_value  # type: ignore
+                ]
             else:
                 values[f.field.name] = from_value
 
@@ -808,6 +814,8 @@ class JsonSchemaMixin:
             elif is_literal(field_type):
                 field_schema = {"enum": list(field_args)}
             elif is_enum(field_type):
+                field_type = cast(Type, field_type)
+                issubclass(Enum, field_type)
                 member_types = set()
                 values = []
                 for member in field_type:
