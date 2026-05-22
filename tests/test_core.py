@@ -6,7 +6,10 @@ from ipaddress import IPv4Address, IPv6Address
 from typing import Any, Dict, List, NewType, Optional, Set, Tuple, Union, cast
 
 from _decimal import Decimal
-from typing_extensions import Final, Literal
+try:
+    from typing_extensions import Final, Literal
+except ImportError:
+    from typing import Final, Literal
 
 try:
     from fastuuid import UUID
